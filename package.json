@@ -1,0 +1,13 @@
+{
+  "name": "soundcast",
+  "version": "0.0.0",
+  "private": false,
+  "repository": "https://github.com/fijimunkii/soundcast",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "author": "Harrison Powers",
+  "license": "MIT",
+  "devDependencies": {
+  }
+}

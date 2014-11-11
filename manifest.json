@@ -1,0 +1,55 @@
+{
+  "name": "Soundcast",
+  "short_name": "soundcast",
+  "version": "0.0.1",
+  "description": "Chromecast extension for Soundcloud",
+  "homepage_url": "https://fijimunkii.github.com/soundcast",
+  "author": "Harrison Powers",
+  "manifest_version": 2,
+  "offline_enabled": true,
+  "icons": {
+    "16": "app/images/soundcast_16.png",
+    "48": "app/images/soundcast_48.png",
+    "128": "app/images/soundcast_128.png"
+  },
+  "options_page": "app/options/index.html",
+  "page_action": {
+    "default_icon": {
+      "19": "app/images/soundcast_16.png",
+      "38": "app/images/soundcast_48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "app/inject/inject.js"
+      ],
+      "matches": [
+        "https://soundcloud.com/*",
+        "https://www.soundcloud.com/*"
+      ]
+    }
+  ],
+  "background": {
+    "persistent": true,
+    "page": "app/background/index.html"
+  },
+  "permissions": [
+    "*://*/*",
+    "tabs",
+    "webRequest",
+    "notifications",
+    "http://soundcloud.com/*",
+    "https://soundcloud.com/*",
+    "http://www.soundcloud.com/*",
+    "https://www.soundcloud.com/*"
+  ],
+  "web_accessible_resources": [
+    "dist/assets/sunrise.css",
+    "dist/assets/sunrise.js",
+    "dist/assets/vendor.css",
+    "dist/assets/vendor.js",
+    "dist/crossdomain.xml"
+  ],
+  "content_security_policy": "connect-src 'self' https://api.soundcloud.com; object-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' https://www.gstatic.com; img-src 'self' https://a-v2.sndcdn.com https://i1.sndcdn.com https://w1.sndcdn.com; report-uri https://harrypowers.it/official-report-center; "
+}
