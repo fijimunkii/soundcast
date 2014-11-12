@@ -1,9 +1,9 @@
 {
   "name": "Soundcast",
   "short_name": "soundcast",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Chromecast extension for Soundcloud",
-  "homepage_url": "https://fijimunkii.github.com/soundcast",
+  "homepage_url": "https://github.com/fijimunkii/soundcast",
   "author": "Harrison Powers",
   "manifest_version": 2,
   "offline_enabled": true,

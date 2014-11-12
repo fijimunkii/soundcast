@@ -4,6 +4,7 @@ window.soundcloudApi = {
     var baseUrl = 'https://api.soundcloud.com/' + url + '.json?';
     var auth = 'client_id=' + 'dc07f9e8441801095408fd67c6e35fa8';
     if (resolveUrl) {
+      console.log(baseUrl += 'url=' + resolveUrl + '&' + auth);
       return baseUrl += 'url=' + resolveUrl + '&' + auth;
     }
     return baseUrl + auth;
@@ -14,10 +15,6 @@ window.soundcloudApi = {
         if (response.errors) {
           return alert('SOUNDCLOUD 404 Yo!');
         }
-
-        //var history = soundcloudApi.container.lookup('controller:queue').get('history');
-        //history.pushObject(url);
-        //localStorage.setItem('soundcloudHistory',history);
 
         $('input#soundcloud').val('');
         if (typeof response === 'object') {

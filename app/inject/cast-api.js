@@ -14,14 +14,12 @@ window.castApi = {
         castApi.currentMediaSession.currentTime /
         castApi.currentMediaSession.media.duration);
       castApi.progress = progress;
-      $('.progress-wrap').attr('data-progress', progress);
-
-      var progressTotal = progress * 0.01  * $('.progress-wrap').width();
+      $progress = $('.progress');
+      $bar = $progress.find('div');
+      var progressTotal = progress * 0.1  * $progress.width();
       var animationLength = 500;
-      // on page load, animate percentage bar to data percentage length
-      // .stop() used to prevent animation queueing
-      $('.progress-bar').stop().animate({
-        left: progressTotal
+      $bar.stop().animate({
+        width: progressTotal
       }, animationLength);
     }
   },
@@ -149,6 +147,20 @@ window.castApi = {
     castApi.session.stop(castApi.onStopAppSuccess, castApi.onError);
   },
 
+  showNotification: function(track) {
+    if (!chrome.notifications) {
+      console.log('chrome notifications api not available');
+      return;
+    }
+    chrome.notifications.create('soundcast', {
+      iconUrl: track.artwork_url,
+      imageUrl: track.artwork_url,
+      title: 'Soundcast',
+      message: 'Now Playing: ' + track.title,
+      priority: -2
+    });
+  },
+
   loadMedia: function(track) {
     if (!castApi.session) {
       console.log("no session");
@@ -157,8 +169,8 @@ window.castApi = {
     castApi.loadMediaTime = new Date();
     console.log('loading...' + track.permalink_url);
     
+    window.$soundcastTitleLink.attr('href',track.permalink_url);
     var url = track.stream_url + '?client_id=dc07f9e8441801095408fd67c6e35fa8'; 
-    window.$soundcastTitleLink.attr('href',url);
     var image = track.artwork_url ?
       track.artwork_url.replace(/large/,'t500x500') : null;
     var artist = track.user ? track.user.username : null;
@@ -168,6 +180,7 @@ window.castApi = {
     mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.MUSIC_TRACK;
     mediaInfo.metadata.title = track.title;
     mediaInfo.metadata.artist = artist;
+    mediaInfo.metadata.link = track.permalink_url;
     mediaInfo.metadata.images = [{'url': image }];
     mediaInfo.contentType = 'audio/mp3';
 
@@ -176,6 +189,7 @@ window.castApi = {
     request.currentTime = 0;
     castApi.session.loadMedia(request,castApi.onMediaDiscovered.bind(castApi,'loadMedia'),
       castApi.onMediaError.bind(castApi));
+    castApi.showNotification(track);
   },
 
   onMediaDiscovered: function(how, mediaSession) {
@@ -183,9 +197,11 @@ window.castApi = {
     castApi.currentMediaSession = mediaSession;
     mediaSession.addUpdateListener(castApi.onMediaStatusUpdate.bind(castApi));
     castApi.mediaCurrentTime = castApi.currentMediaSession.currentTime;
+    window.$soundcastCtrl.show();
     window.$soundcastPlay.addClass('playing');
     window.$soundcastTitle.removeClass('paused');
-    window.$soundcastTitleLink.text(mediaSession.media.metadata.title);
+    window.$soundcastTitleLink.text(mediaSession.media.metadata.title)
+      .attr('href', mediaSession.media.metadata.link);
     $('.volume').attr('data-level',mediaSession.volume.level * 10);
     castApi.isPlaying = true;
     castApi.moveProgressBar();
@@ -197,9 +213,10 @@ window.castApi = {
 
   onMediaStatusUpdate: function(e) {
     //console.log('isMediaPlaying',e);
+    console.log(JSON.parse(localStorage.getItem('tracks')));
     // if no longer playing and not set to paused or stopped,
     // play the next item in the queue
-    if (!e && castApi.isPlaying && (new Date() - castApi.loadMediaTime > 1000)) {
+    if (!e && castApi.isPlaying) {
       castApi.startPlaying();
     }
     if( castApi.progressFlag ) {
@@ -216,7 +233,8 @@ window.castApi = {
   },
 
   startPlaying: function(override) {
-    if (castApi.isPlaying && !override) {
+    if (new Date() - castApi.loadMediaTime < 1000 ||
+        castApi.isPlaying && !override) {
       console.log('already playing');
       return;
     }
@@ -275,6 +293,7 @@ window.castApi = {
         castApi.onError.bind(castApi));
     castApi.isPlaying = false;
     castApi.isPaused = false;
+    window.$soundcastCtrl.hide();
     window.$soundcastPlay.removeClass('playing');
     window.$soundcastTitle.addClass('paused');
     window.$soundcastTitleLink.text('');

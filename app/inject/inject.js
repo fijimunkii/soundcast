@@ -1,17 +1,15 @@
-(function() {
-  if (injected) {
+console.log('hello');
+setTimeout(function() {
+  if (window.injected) {
+    console.log('already injected');
     return;
   }
-  injected = true;
+  window.injected = true;
   console.log('soundcast injected');
 
   // An object that will contain the "methods"
   // we can use from the "background"
   var methods = {
-    addToQueue: function() {
-      // for now this will just play a track
-          
-    },
     initCast: function() {
       var host = 'https://soundcast-app.appspot.com/app/inject/';
       loadScript('https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js', function() {
@@ -43,11 +41,6 @@
 
 
 
-
-
-
-
-
   function loadScript(url, callback){
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -67,4 +60,4 @@
     script.src = url;
     document.body.appendChild(script);
   }
-});
+},1000);
