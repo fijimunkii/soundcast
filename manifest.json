@@ -1,7 +1,7 @@
 {
   "name": "Soundcast",
   "short_name": "soundcast",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Chromecast extension for Soundcloud",
   "homepage_url": "https://github.com/fijimunkii/soundcast",
   "author": "Harrison Powers",
@@ -35,14 +35,14 @@
     "page": "app/background/index.html"
   },
   "permissions": [
-    "*://*/*",
     "tabs",
-    "webRequest",
     "notifications",
     "http://soundcloud.com/*",
     "https://soundcloud.com/*",
     "http://www.soundcloud.com/*",
-    "https://www.soundcloud.com/*"
+    "https://www.soundcloud.com/*",
+    "http://soundcast-app.appspot.com/*",
+    "https://soundcast-app.appspot.com/*"
   ],
   "web_accessible_resources": [
     "dist/assets/sunrise.css",

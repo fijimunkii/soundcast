@@ -213,10 +213,12 @@ window.castApi = {
 
   onMediaStatusUpdate: function(e) {
     //console.log('isMediaPlaying',e);
-    console.log(JSON.parse(localStorage.getItem('tracks')));
+    console.log('JSON.parse(localStorage.getItem(\'tracks\'))',
+      JSON.parse(localStorage.getItem('tracks')));
     // if no longer playing and not set to paused or stopped,
     // play the next item in the queue
     if (!e && castApi.isPlaying) {
+      castApi.isPlaying = false;
       castApi.startPlaying();
     }
     if( castApi.progressFlag ) {

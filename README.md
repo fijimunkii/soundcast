@@ -27,3 +27,6 @@ This project has a great structure https://github.com/mailvelope/mailvelope/blob
 http://192.168.1.3:8008/setup/eureka_info
 curl -H "Content-Type: application/json" http://192.168.1.3:8008/apps/YouTube -X POST -d 'v=oHg5SJYRHA0'
 http://fiquett.com/2013/07/chromecast-traffic-sniffing/
+
+
+http://boedesign.com/blog/2009/07/11/growl-for-jquery-gritter/
