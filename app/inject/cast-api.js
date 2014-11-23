@@ -1,18 +1,17 @@
 window.castApi = {
 
-  isConnectedToCast: false,
-  currentMediaSession: null,
-  debugMessages: [],
+  session: null,
+  mediaSession: null,
+
   mediaCurrentTime: 0,
   currentVolume: 1,
   progressFlag: 1,
-  session: null,
 
   moveProgressBar: function() {
-    if (castApi.progressFlag && castApi.currentMediaSession) {
+    if (castApi.progressFlag && castApi.mediaSession) {
       var progress = parseInt(100 *
-        castApi.currentMediaSession.currentTime /
-        castApi.currentMediaSession.media.duration);
+        castApi.mediaSession.currentTime /
+        castApi.mediaSession.media.duration);
       castApi.progress = progress;
       $progress = $('.progress');
       $bar = $progress.find('div');
@@ -81,12 +80,11 @@ window.castApi = {
   },
 
   onInitSuccess: function() {
-    castApi.isConnectedToCast = true;
     console.log('init success');
   },
 
-  onError: function() {
-    console.log("error");
+  onError: function(e) {
+    console.log('cast error', e);
   },
 
   onSuccess: function(message) {
@@ -94,37 +92,32 @@ window.castApi = {
   },
 
   onStopAppSuccess: function() {
-    castApi.isConnectedToCast = false;
-    console.log('Session stopped');
+    console.log('cast session stopped');
     document.getElementById("casticon").src = 'images/cast_icon_idle.png'; 
   },
 
   sessionListener: function(e) {
-    console.log('New session ID: ' + e.sessionId);
+    console.log('new cast session:', e);
     castApi.session = e;
-    if (castApi.session.media.length !== 0) {
-      castApi.onMediaDiscovered('onRequestSessionSuccess_', castApi.session.media[0]);
-    }
+    if (castApi.session.media.length !== 0)
+      castApi.onMedia('onRequestSessionSuccess_', castApi.session.media[0]);
     castApi.session.addMediaListener(
-      castApi.onMediaDiscovered.bind(castApi,'addMediaListener'));
+      castApi.onMedia.bind(castApi,'addMediaListener'));
     castApi.session.addUpdateListener(castApi.sessionUpdateListener.bind(castApi));
   },
 
   sessionUpdateListener: function(isAlive) {
-    var message = isAlive ? 'Session Updated' : 'Session Removed';
-    message += ': ' + castApi.session.sessionId;
-    if (!isAlive) {
+    var message = isAlive ? 'cast session updated:' : 'cast session removed:';
+    console.log(message, castApi.session);
+    if (!isAlive)
       castApi.session = null;
-    }
   },
 
   receiverListener: function(e) {
-    if( e === 'available' ) {
-      console.log("receiver found");
-    }
-    else {
-      console.log("receiver list empty");
-    }
+    if (e === 'available')
+      console.log('receiver found');
+    else
+      console.log('receiver list empty');
   },
 
   launchApp: function() {
@@ -134,9 +127,10 @@ window.castApi = {
   },
 
   onRequestSessionSuccess: function(e) {
-    console.log("session success: " + e.sessionId, e);
+    console.log('session success:', e);
     castApi.session = e;
-    castApi.startPlaying();
+    console.log('lets play some tunes');
+    return castApi.startPlaying();
   },
 
   onLaunchError: function(e) {
@@ -187,16 +181,17 @@ window.castApi = {
     var request = new chrome.cast.media.LoadRequest(mediaInfo);
     request.autoplay = true;
     request.currentTime = 0;
-    castApi.session.loadMedia(request,castApi.onMediaDiscovered.bind(castApi,'loadMedia'),
+    castApi.session.loadMedia(request,castApi.onMedia.bind(castApi,'loadMedia'),
       castApi.onMediaError.bind(castApi));
     castApi.showNotification(track);
+    window.soundcastQueue.remove(track);
   },
 
-  onMediaDiscovered: function(how, mediaSession) {
-    console.log("new media session ID:" + mediaSession.mediaSessionId);
-    castApi.currentMediaSession = mediaSession;
+  onMedia: function(origin, mediaSession) {
+    console.log("cast media session:", mediaSession);
+    castApi.mediaSession = mediaSession;
     mediaSession.addUpdateListener(castApi.onMediaStatusUpdate.bind(castApi));
-    castApi.mediaCurrentTime = castApi.currentMediaSession.currentTime;
+    castApi.mediaCurrentTime = castApi.mediaSession.currentTime;
     window.$soundcastCtrl.show();
     window.$soundcastPlay.addClass('playing');
     window.$soundcastTitle.removeClass('paused');
@@ -205,6 +200,7 @@ window.castApi = {
     $('.volume').attr('data-level',mediaSession.volume.level * 10);
     castApi.isPlaying = true;
     castApi.moveProgressBar();
+    window.soundcastQueue.render();
   },
 
   onMediaError: function(e) {
@@ -213,8 +209,7 @@ window.castApi = {
 
   onMediaStatusUpdate: function(e) {
     //console.log('isMediaPlaying',e);
-    console.log('JSON.parse(localStorage.getItem(\'tracks\'))',
-      JSON.parse(localStorage.getItem('tracks')));
+    console.log(JSON.parse(localStorage.getItem('tracks')));
     // if no longer playing and not set to paused or stopped,
     // play the next item in the queue
     if (!e && castApi.isPlaying) {
@@ -222,12 +217,12 @@ window.castApi = {
       castApi.startPlaying();
     }
     if( castApi.progressFlag ) {
-      var progress = parseInt(100 * castApi.currentMediaSession.currentTime / castApi.currentMediaSession.media.duration);
+      var progress = parseInt(100 * castApi.mediaSession.currentTime / castApi.mediaSession.media.duration);
       castApi.progress = progress;
     }
-    castApi.playerState = castApi.currentMediaSession.playerState;
-    $('.volume').attr('data-level',castApi.currentMediaSession.volume.level * 10);
-    if (castApi.currentMediaSession.volume.muted) {
+    castApi.playerState = castApi.mediaSession.playerState;
+    $('.volume').attr('data-level',castApi.mediaSession.volume.level * 10);
+    if (castApi.mediaSession.volume.muted) {
       $('.volume').addClass('muted');
     } else {
       $('.volume').removeClass('muted');
@@ -239,6 +234,10 @@ window.castApi = {
         castApi.isPlaying && !override) {
       console.log('already playing');
       return;
+    }
+    if (!castApi.session) {
+      console.log("no session");
+      return castApi.launchApp();
     }
     var tracks = JSON.parse(localStorage.getItem('tracks'));
     //console.log(tracks);
@@ -258,23 +257,23 @@ window.castApi = {
   },
 
   pausePlay: function() {
-    if (!castApi.currentMediaSession) {
+    if (!castApi.mediaSession) {
       castApi.startPlaying();
       return;
     }
      if (castApi.isPlaying) {
       if (!castApi.isPaused) {
-        castApi.currentMediaSession.pause(null,
+        castApi.mediaSession.pause(null,
           castApi.mediaCommandSuccessCallback.bind(castApi,
-            "paused " + castApi.currentMediaSession.sessionId),
+            "paused " + castApi.mediaSession.sessionId),
             castApi.onError.bind(castApi));
         castApi.isPaused = true;
         window.$soundcastPlay.removeClass('playing');
         window.$soundcastTitle.addClass('paused');
       } else {
-        castApi.currentMediaSession.play(null,
+        castApi.mediaSession.play(null,
           castApi.mediaCommandSuccessCallback.bind(castApi,
-            "resumed " + castApi.currentMediaSession.sessionId),
+            "resumed " + castApi.mediaSession.sessionId),
             castApi.onError.bind(castApi));
         castApi.isPaused = false;
         window.$soundcastPlay.addClass('playing');
@@ -286,12 +285,12 @@ window.castApi = {
   },
 
   stopMedia: function() {
-    if(!castApi.currentMediaSession){ 
+    if(!castApi.mediaSession){ 
       return;
     }
-    castApi.currentMediaSession.stop(null,
+    castApi.mediaSession.stop(null,
       castApi.mediaCommandSuccessCallback.bind(castApi,
-        "stopped " + castApi.currentMediaSession.sessionId),
+        "stopped " + castApi.mediaSession.sessionId),
         castApi.onError.bind(castApi));
     castApi.isPlaying = false;
     castApi.isPaused = false;
@@ -302,7 +301,7 @@ window.castApi = {
   },
 
   setMediaVolume: function(level, mute) {
-    if( !castApi.currentMediaSession ) {
+    if( !castApi.mediaSession ) {
       return;
     }
 
@@ -312,7 +311,7 @@ window.castApi = {
     volume.muted = mute;
     var request = new chrome.cast.media.VolumeRequest();
     request.volume = volume;
-    castApi.currentMediaSession.setVolume(request,
+    castApi.mediaSession.setVolume(request,
       castApi.mediaCommandSuccessCallback.bind(castApi,'media set-volume done'),
       castApi.onError.bind(castApi));
     castApi.mediaVolume = level;
@@ -353,12 +352,12 @@ window.castApi = {
 
 
   seekMedia: function(pos) {
-    console.log('Seeking ' + castApi.currentMediaSession.sessionId + ':' +
-      castApi.currentMediaSession.mediaSessionId + ' to ' + pos + "%");
+    console.log('Seeking ' + castApi.mediaSession.sessionId + ':' +
+      castApi.mediaSession.mediaSessionId + ' to ' + pos + "%");
     castApi.progressFlag = 0;
     var request = new chrome.cast.media.SeekRequest();
-    request.currentTime = pos * castApi.currentMediaSession.media.duration / 100;
-    castApi.currentMediaSession.seek(request,
+    request.currentTime = pos * castApi.mediaSession.media.duration / 100;
+    castApi.mediaSession.seek(request,
       castApi.onSeekSuccess.bind(castApi,'media seek done'),
       castApi.onError);
   },

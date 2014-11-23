@@ -1,11 +1,11 @@
-console.log('hello');
 setTimeout(function() {
-  if (window.injected) {
+  if (window.soundcast && window.soundcast.injected) {
     console.log('already injected');
     return;
   }
-  window.injected = true;
-  console.log('soundcast injected');
+  window.soundcast = window.soundcast || {};
+  window.soundcast.injected = true;
+  console.log('soundcast 0.0.6 injected');
 
   // An object that will contain the "methods"
   // we can use from the "background"
@@ -15,8 +15,10 @@ setTimeout(function() {
       loadScript('https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js', function() {
         loadScript(host + 'soundcloud-api.js', function() {
           loadScript(host + 'cast-api.js', function() {
-            loadScript(host + 'init.js', function() {
-              loadScript('https://www.gstatic.com/cv/js/sender/v1/cast_sender.js', function() {
+            loadScript(host + 'queue-api.js', function() {
+              loadScript(host + 'init.js', function() {
+                loadScript('https://www.gstatic.com/cv/js/sender/v1/cast_sender.js', function() {
+                });
               });
             });
           });
@@ -39,8 +41,7 @@ setTimeout(function() {
 
 
 
-
-
+  // utility for pulling scripts into main dom
   function loadScript(url, callback){
     var script = document.createElement("script");
     script.type = "text/javascript";

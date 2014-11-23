@@ -58,12 +58,7 @@ window.soundcloudApi = {
     }
   },
   addTrack: function(track) {
-    var tracks = JSON.parse(localStorage.getItem('tracks'));
-    if (!tracks) {
-      tracks = [];
-    }
-    tracks.push(track);
-    localStorage.setItem('tracks',JSON.stringify(tracks));
+    window.soundcastQueue.add(track);
     window.castApi.startPlaying();
   }
 };
