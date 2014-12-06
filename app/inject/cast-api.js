@@ -1,9 +1,8 @@
 window.castApi = {
 
-  receiverAppId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-
   session: null,
   mediaSession: null,
+
   mediaCurrentTime: 0,
   currentVolume: 1,
   progressFlag: 1,
@@ -65,7 +64,7 @@ window.castApi = {
 
 
     var sessionRequest = new chrome.cast.SessionRequest(
-      castApi.receiverAppId,
+      chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
       chrome.cast.Capability,
       null,
       15000);
