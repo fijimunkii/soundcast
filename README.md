@@ -22,4 +22,4 @@ https://developer.chrome.com/extensions/browserAction
 https://developer.chrome.com/extensions/manifest
 https://developer.chrome.com/extensions/manifest/storage
 
-This project has a great structure https://github.com/mailvelope/mailvelope/blob/master/
+This project has a great structure: https://github.com/mailvelope/mailvelope/
