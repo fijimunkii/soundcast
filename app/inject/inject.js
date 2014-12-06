@@ -39,8 +39,6 @@ setTimeout(function() {
   // send initial onload request
   chrome.extension.sendRequest({onLoad:true, inject:true});
 
-
-
   // utility for pulling scripts into main dom
   function loadScript(url, callback){
     var script = document.createElement("script");

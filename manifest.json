@@ -1,7 +1,7 @@
 {
   "name": "Soundcast",
   "short_name": "soundcast",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Soundcloud chromecast extension. Cast music!",
   "homepage_url": "https://github.com/fijimunkii/soundcast",
   "author": "Harrison Powers",
@@ -35,8 +35,6 @@
   },
   "permissions": [
     "tabs",
-    "cast",
-    "notifications",
     "http://soundcloud.com/*",
     "https://soundcloud.com/*",
     "http://www.soundcloud.com/*",

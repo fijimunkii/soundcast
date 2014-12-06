@@ -1,8 +1,9 @@
 window.castApi = {
 
+  receiverAppId: 'chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID',
+
   session: null,
   mediaSession: null,
-
   mediaCurrentTime: 0,
   currentVolume: 1,
   progressFlag: 1,
@@ -64,7 +65,7 @@ window.castApi = {
 
 
     var sessionRequest = new chrome.cast.SessionRequest(
-      chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+      eval(castApi.receiverAppId),
       chrome.cast.Capability,
       null,
       15000);
@@ -142,17 +143,18 @@ window.castApi = {
   },
 
   showNotification: function(track) {
-    if (!chrome.notifications) {
-      console.log('chrome notifications api not available');
-      return;
-    }
-    chrome.notifications.create('soundcast', {
+    // unfortunately chrome.* apis are not available to injected scripts
+    // so there is no way of sending a notification or
+    // asking the extension background to do it
+    /*
+    chrome.extension.sendRequest({notification: true, data: {
       iconUrl: track.artwork_url,
       imageUrl: track.artwork_url,
       title: 'Soundcast',
       message: 'Now Playing: ' + track.title,
       priority: -2
-    });
+    }});
+    */
   },
 
   loadMedia: function(track) {
