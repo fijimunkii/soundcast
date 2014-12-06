@@ -15,6 +15,7 @@ handlers:
   upload: app/(.*)
 
 skip_files:
+  - ^(.*/)?.*.git/.*$
   - ^(.*/)?.*node_modules/.*$
   - ^(.*/)?.*bower_components/.*$
   - ^(.*/)?.*.swp
