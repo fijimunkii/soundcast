@@ -207,6 +207,8 @@ window.castApi = {
 
   onMediaError: function(e) {
     console.log("media error",e);
+    if (e.description === 'LOAD_FAILED')
+      castApi.startPlaying();
   },
 
   onMediaStatusUpdate: function(e) {
