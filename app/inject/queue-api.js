@@ -30,9 +30,8 @@ window.soundcastQueue = {
     var tracks = JSON.parse(localStorage.getItem('tracks'));
     if (!tracks)
       tracks = [];
-    }
     tracks.push(track);
-    tracks.flatten(); // in case track was actually tracks ;)
+    tracks = [].concat.apply([], tracks); // in case track was actually tracks ;)
     localStorage.setItem('tracks',JSON.stringify(tracks));
     soundcastQueue.render();
   },
@@ -49,6 +48,11 @@ window.soundcastQueue = {
         soundcastQueue.render();
       }
     });
+  },
+
+  clear: function() {
+    localStorage.setItem('tracks', '[]');
+    soundcastQueue.render();
   }
 
 };

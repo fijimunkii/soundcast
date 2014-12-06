@@ -58,5 +58,8 @@ window.soundcloudApi = {
   addTrack: function(track) {
     window.soundcastQueue.add(track);
     window.castApi.startPlaying();
+  },
+  notification: function(data) {
+/*<div id="gritter-notice-wrapper" class="top-right"><div id="gritter-item-5" class="gritter-item-wrapper error" style=""><div class="gritter-top"></div><div class="gritter-item"><div class="gritter-close" style="display: none;"></div><div class="gritter-without-image"><p>There was a problem playing this track.</p></div><div style="clear:both"></div></div><div class="gritter-bottom"></div></div></div> */
   }
 };
