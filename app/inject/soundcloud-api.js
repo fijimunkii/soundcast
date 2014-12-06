@@ -47,15 +47,13 @@ window.soundcloudApi = {
       return console.log(response);
     }
     if (response.tracks) { // playlist
-      response.tracks.forEach(function(track) {
-        console.log(track);
-        soundcloudApi.addTrack(track);
-      });
+      soundcloudApi.addTracks(response.tracks);
     } else { // everything else
-      response.forEach(function(track) {
-        soundcloudApi.addTrack(track); 
-      });
+      soundcloudApi.addTracks(response); 
     }
+  },
+  addTracks: function(tracks) {
+    window.soundcastQueue.add(tracks); 
   },
   addTrack: function(track) {
     window.soundcastQueue.add(track);

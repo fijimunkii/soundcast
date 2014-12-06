@@ -30,7 +30,9 @@ window.soundcastQueue = {
     var tracks = JSON.parse(localStorage.getItem('tracks'));
     if (!tracks)
       tracks = [];
+    }
     tracks.push(track);
+    tracks.flatten(); // in case track was actually tracks ;)
     localStorage.setItem('tracks',JSON.stringify(tracks));
     soundcastQueue.render();
   },

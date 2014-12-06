@@ -5,7 +5,7 @@ setTimeout(function() {
   }
   window.soundcast = window.soundcast || {};
   window.soundcast.injected = true;
-  console.log('soundcast 0.0.6 injected');
+  console.log('soundcast injected');
 
   // An object that will contain the "methods"
   // we can use from the "background"
