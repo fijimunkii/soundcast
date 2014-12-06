@@ -1,3 +1,12 @@
+var storage = JSON.parse(localStorage.getItem('soundcast'));
+storage = storage || {};
+if (true || !storage.hasSeenInstructions) {
+  console.log('first time user, showing instructions.');
+  var url = chrome.extension.getURL('app/instructions/index.html');
+  chrome.tabs.create({'url': url});
+  localStorage.setItem('soundcast', JSON.stringify({hasSeenInstructions:true}));
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
   if (!chrome.extension)
