@@ -1,6 +1,6 @@
 var storage = JSON.parse(localStorage.getItem('soundcast'));
 storage = storage || {};
-if (true || !storage.hasSeenInstructions) {
+if (!storage.hasSeenInstructions) {
   console.log('first time user, showing instructions.');
   var url = chrome.extension.getURL('app/instructions/index.html');
   chrome.tabs.create({'url': url});
