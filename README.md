@@ -1,4 +1,4 @@
-# Soundcast
+# Soundcast [No longer maintained]
 
 Soundcloud. Chromecast. You get the idea.
 
